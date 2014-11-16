@@ -1,16 +1,26 @@
 ---
-title: "RepDataPeerAssessment"
+title: "Reproducibility Data Peer Assessment Project"
 output: html_document
 ---  
    
   
 ###Loading and preprocessing the data
 
-Lets load the data from the following website:
+Student Name: Kannan Subbiah
+
+Submission of Reproducible Data for processing the personal movement using activity monitoring devices for 5 minute intervals.  This markdown will demonstrate the strategy used to process the data as well as the actual results that can be reproduced using the same data used by my program.
+
+-------------------------------------------
+
+
+I loaded the data from the following website:
+
 http://d396qusza40orc.cloudfront.net/repdata/data/  
+
 File Name: activity.zip  
 File: activity.csv  
-Link: [activity.zip](http://d396qusza40orc.cloudfront.net/repdata/data/activity.zip)  
+
+File Link: [activity.zip](http://d396qusza40orc.cloudfront.net/repdata/data/activity.zip)  
 
 The variables included in this dataset are:
 
@@ -23,7 +33,8 @@ The variables included in this dataset are:
 The dataset is stored in a comma-separated-value (CSV) file and there are a total of 17,568 observations in this dataset.  
 
 
-Loading the dplyr library for doing the "summarise" operation on the data set.
+Loading the neccessary library for processing the dataset.
+Here we load dplyr, timeDate and lattice packages.
   
 
 ```r
@@ -31,6 +42,8 @@ library(dplyr)
 library(timeDate)
 library(lattice)
 ```
+
+Now lets go ahead and load the data directly from the website.
 
 *Here is the code to read the data* 
 
@@ -50,10 +63,12 @@ unlink(TempFile)
 #summary(Activity)
 ```
 
+
 ###Calculate the Mean total number of steps taken per day.
 
-*Here is the code that measures the mean for the steps taken per day.*
+The next step is to process the data to find the Mean and Median of the dataset.
 
+*Here is the code that measures the mean for the steps taken per day.*
 
 ```r
 MeanSteps <- mean(Activity$steps, na.rm = TRUE)
@@ -66,6 +81,8 @@ The median total number of steps taken per day is **0**
 
 
 ###Histogram of the total number of steps taken each day
+
+Next step is to plot a histogram of the dataset's steps taken values.
 
 *Code to create a histogram:*
 
@@ -97,9 +114,9 @@ plot(AvgIntervalPattern$interval, AvgIntervalPattern$IntervalMean, type="l", xla
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
-Now we calculate which date contains the maximum numbers of steps
-Code to pick the date which has the maximum average daily steps.
+Now we calculate which Interval contains the maximum numbers of steps
 
+*Here is the code to pick the Interval which has maximum average daily steps.*
 
 ```r
 # Calculate the Maximum number of average steps registered per 5 minute interval
@@ -114,8 +131,8 @@ MaxStepsInterval <- as.character(AvgIntervalPattern$interval[which(AvgIntervalPa
 
 
 Now we calculate the total number of rows that has NA in "steps" column.
-Code to pick the date which has the maximum average daily steps.
 
+*Here is the code to find the NA values in the dataset.
 
 ```r
 # Calculate the Total number of NA by subtracting the complete cases from total rows
@@ -123,12 +140,6 @@ TotalNA <-  nrow(Activity) - sum(complete.cases(Activity))
 ```
 
 The record set has **2304** number of rows that has missing values : NA
-
-
-Now that we know how many NAs are there in the dataset, we need to fix the NA rows.
-First lets add a new column to Activity data frame called "Avg"
-Fill in the Avg value with the 5 minute interval average value that we calculated above
-in the dataframe AvgIntervalPattern
 
 Current Activity dataframe contains the following data
 
@@ -146,6 +157,12 @@ head(Activity)
 ## 5    NA 2012-10-01       20
 ## 6    NA 2012-10-01       25
 ```
+
+
+Now that we know how many NAs are there in the dataset, we need to fix the NA rows.
+First lets copy Activity dataframe to Activity2 and add a new column called "Avg"
+Fill in the Avg value with the 5 minute interval average value that we calculated above
+in the dataframe AvgIntervalPattern
 
 Lets look at the AvgIntervalPattern dataframe
 It contains the 5 minute interval average for all days in column IntervalMean.
@@ -166,8 +183,10 @@ head(AvgIntervalPattern)
 ## 6       25    2.0943396
 ```
 
-Lets create a new dataset called Activity2 
-Lets add IntervalMean column from AvgIntervalPattern to Activity2 dataframe.
+Lets add IntervalMean column to Activity2 and copy data from AvgIntervalPattern's IntervalMean
+data to Activity2 dataframe.
+
+*Here is the code to do that step*
 
 ```r
 Activity2 <- Activity
@@ -201,6 +220,7 @@ tail(Activity2)
 ```
 
 We got the average 5 minute interval added to all days
+To fix the NA values with 5 minute interval values, 
 Lets get the row number of all "steps" that has NA
 
 
@@ -223,7 +243,6 @@ head(NARows)
 
 Now that we got all the row numbers in NARows, lets go ahead and replace
 any "steps" row that has "NA" with the value in "Avg" row
-
 
 
 ```r
@@ -296,7 +315,7 @@ Activity2$Avg <- NULL
 *Code to create a histogram:*
 
 ```r
-hist(Activity2$steps, xlab="Steps", main="Histogram of Total Number of Steps taken each day")
+hist(Activity2$steps, xlab="Steps", main="Histogram of Total Number of Steps taken each day - No NA")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
@@ -327,7 +346,7 @@ Median total number of steps with NA is **0**
 ## By fixing the NA with average values, there is no big difference in Median value at all!
 ```
 
-Add a new column called Day to Activity2.
+Add a new factor column called **Day** to Activity2.
 If the date falls in a WeekDay, then make Day as "WeekDay" else, make it "WeekEnd"
 
 
@@ -345,4 +364,6 @@ xyplot(steps ~ interval | Day , data = Activity2, layout = c(1,2), type="l")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-19-1.png) 
+
+The entire R markdown can be run from knitr and the exact above results can be obtained or reproduced, unless the original dataset from the website changes.
 
